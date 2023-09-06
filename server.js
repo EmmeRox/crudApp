@@ -15,27 +15,36 @@ const url =
 //});
 
 //Using promises
-MongoClient.connect(url)
-  .then((client) => {
-    console.log("Connected to Database");
-    const db = client.db("quote-app");
-    const quotesCollection = db.collection("quotes");
-    //express request handlers go here bc this is where the db variable is and it is necessary
-    //Make sure to have the body-parser before the CRUD handlers
-    app.use(bodyParser.urlencoded({ extended: true }));
-    app.get("/", (req, res) => {
-      res.sendFile("/Users/timmy/crudApp" + "/index.html");
-    });
-    app.post("/quotes", (req, res) => {
-      quotesCollection
-        .insertOne(req.body)
-        .then((result) => {
-          res.redirect("/");
-        })
-        .catch((error) => console.log(error));
-    });
-    app.listen(3000, function () {
-      console.log("listening on 3000");
-    });
-  })
-  .catch((error) => console.log(error));
+MongoClient.connect(url).then((client) => {
+  console.log("Connected to Database");
+  const db = client.db("quote-app");
+  const quotesCollection = db.collection("quotes");
+  //express request handlers go here bc this is where the db variable is and it is necessary
+  //Below tells Express that we will be using EJS as the template engine
+  app.set("view engine", "ejs");
+  //Make sure to have the body-parser before the CRUD handlers
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.get("/", (req, res) => {
+    res.sendFile("/Users/timmy/crudApp" + "/index.html");
+    const cursor = db
+      .collection("quotes")
+      .find()
+      .toArray()
+      .then((results) => {
+        console.log(results);
+        console.log(cursor);
+      })
+      .catch((error) => console.log(error));
+  });
+});
+app.post("/quotes", (req, res) => {
+  quotesCollection
+    .insertOne(req.body)
+    .then((result) => {
+      res.redirect("/");
+    })
+    .catch((error) => console.log(error));
+});
+app.listen(3000, function () {
+  console.log("listening on 3000");
+});
