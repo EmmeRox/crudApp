@@ -26,15 +26,14 @@ MongoClient.connect(url).then((client) => {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.get("/", (req, res) => {
     res.sendFile("/Users/timmy/crudApp" + "/index.html");
-    const cursor = db
-      .collection("quotes")
+    db.collection("quotes")
       .find()
       .toArray()
       .then((results) => {
         console.log(results);
-        console.log(cursor);
       })
       .catch((error) => console.log(error));
+    res.render("index.ejs", {});
   });
 });
 app.post("/quotes", (req, res) => {
