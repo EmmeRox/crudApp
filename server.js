@@ -25,25 +25,26 @@ MongoClient.connect(url).then((client) => {
   //Make sure to have the body-parser before the CRUD handlers
   app.use(bodyParser.urlencoded({ extended: true }));
   app.get("/", (req, res) => {
-    res.sendFile("/Users/timmy/crudApp" + "/index.html");
     db.collection("quotes")
       .find()
       .toArray()
       .then((results) => {
-        console.log(results);
+        return res.render("index.ejs", { quotes: results });
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.sendStatus(500);
+      });
+  });
+  app.post("/quotes", (req, res) => {
+    quotesCollection
+      .insertOne(req.body)
+      .then((result) => {
+        res.redirect("/");
       })
       .catch((error) => console.log(error));
-    res.render("index.ejs", {});
   });
-});
-app.post("/quotes", (req, res) => {
-  quotesCollection
-    .insertOne(req.body)
-    .then((result) => {
-      res.redirect("/");
-    })
-    .catch((error) => console.log(error));
-});
-app.listen(3000, function () {
-  console.log("listening on 3000");
+  app.listen(3000, function () {
+    console.log("listening on 3000");
+  });
 });
