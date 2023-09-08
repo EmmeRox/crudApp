@@ -24,7 +24,13 @@ MongoClient.connect(url).then((client) => {
   app.set("view engine", "ejs");
   //Make sure to have the body-parser before the CRUD handlers
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(express.static('public'))
+  app.use(express.static("public"));
+  app.use(bodyParser.json());
+  app.put("/quotes", (req, res) => {
+    quotesCollection.findOneAndUpdate(query, update, options).then((result) => {
+      /*.....*/
+    });
+  });
   app.get("/", (req, res) => {
     db.collection("quotes")
       .find()
