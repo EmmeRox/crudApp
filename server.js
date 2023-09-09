@@ -27,9 +27,30 @@ MongoClient.connect(url).then((client) => {
   app.use(express.static("public"));
   app.use(bodyParser.json());
   app.put("/quotes", (req, res) => {
-    quotesCollection.findOneAndUpdate(query, update, options).then((result) => {
-      /*.....*/
-    });
+    //the findOneAndUpdate method lets us find and change one item in the database
+    //query lets us filter the collaction with key-value pairs
+    //update tells mongo what to change
+    //options tells mongo to define additional options for this update request
+    quotesCollection
+      .findOneAndUpdate(
+        { name: "Yoda" },
+        //$set is a mongo update operator, also there's $inc and $push
+        {
+          $set: {
+            name: req.body.name,
+            quote: req.body.quote,
+          },
+        },
+        //below, we are telling mongo to insert a document if no documents can be update, i.e no quotes exist in the database
+        {
+          upsert: true,
+        }
+      )
+      .then((result) => {
+        //STOPPED BELOW, need to figure out why change isn't happening
+        console.log(result);
+      })
+      .catch((error) => console.error(error));
   });
   app.get("/", (req, res) => {
     db.collection("quotes")
